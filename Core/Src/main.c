@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tm1637.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t CurrentDisplay[4];
+uint8_t tm1637_Segments[8] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,7 +68,14 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+    tm1637_Segments[0] = A_SEG;
+    tm1637_Segments[1] = B_SEG;
+    tm1637_Segments[2] = C_SEG;
+    tm1637_Segments[3] = D_SEG;
+    tm1637_Segments[4] = E_SEG;
+    tm1637_Segments[5] = F_SEG;
+    tm1637_Segments[6] = G_SEG;
+    tm1637_Segments[7] = DP_SEG;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -92,15 +100,19 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+    HAL_GPIO_WritePin(SCLK_GPIO_Port, SCLK_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(SDO_GPIO_Port, SDO_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
-
+    CurrentDisplay[0] = char2segments('2');
+    CurrentDisplay[1] = char2segments('0');
+    CurrentDisplay[2] = char2segments('2');
+    CurrentDisplay[3] = char2segments('5');
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-
+      tm1637_DisplayHandle(7, CurrentDisplay);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
