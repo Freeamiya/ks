@@ -1,0 +1,96 @@
+{
+  "name": "89c52_test",
+  "type": "C51",
+  "dependenceList": [],
+  "srcDirs": [
+    "src",
+    "inc"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": []
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "d4f172c8ba6b366fbba2d473905bdb3b"
+  },
+  "targets": {
+    "Debug": {
+      "excludeList": [],
+      "toolchain": "SDCC",
+      "compileConfig": {
+        "options": "null"
+      },
+      "uploader": "stcgal",
+      "uploadConfig": {
+        "bin": "",
+        "eepromImgPath": "null",
+        "extraOptions": "",
+        "options": ".eide/stc.flash.json"
+      },
+      "uploadConfigMap": {
+        "Custom": {
+          "bin": "",
+          "commandLine": "python ./tools/stcflash.py -p ${port} \"${programFile}\"",
+          "eraseChipCommand": ""
+        },
+        "stcgal": {
+          "bin": "",
+          "eepromImgPath": "null",
+          "extraOptions": "",
+          "options": ".eide/stc.flash.json"
+        }
+      },
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "inc"
+        ],
+        "libList": [],
+        "defineList": []
+      },
+      "builderOptions": {
+        "SDCC": {
+          "version": 3,
+          "beforeBuildTasks": [],
+          "afterBuildTasks": [],
+          "global": {
+            "device": "mcs51",
+            "optimize-type": "speed",
+            "misc-controls": "--iram-size 256 --xram-size 0 --code-size 8192"
+          },
+          "c/cpp-compiler": {
+            "language-c": "c99"
+          },
+          "asm-compiler": {},
+          "linker": {
+            "$mainFileName": "main",
+            "output-format": "hex"
+          }
+        },
+        "Keil_C51": {
+          "version": 2,
+          "beforeBuildTasks": [],
+          "afterBuildTasks": [],
+          "global": {
+            "ram-mode": "SMALL",
+            "rom-mode": "LARGE"
+          },
+          "c/cpp-compiler": {
+            "optimization-type": "SPEED",
+            "optimization-level": "level-8"
+          },
+          "asm-compiler": {},
+          "linker": {
+            "remove-unused": true,
+            "output-format": "elf"
+          }
+        }
+      }
+    }
+  },
+  "version": "3.5"
+}
