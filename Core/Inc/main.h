@@ -57,9 +57,9 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SR04_ECHO_Pin GPIO_PIN_8
+#define SR04_ECHO_Pin GPIO_PIN_10
 #define SR04_ECHO_GPIO_Port GPIOA
-#define SR04_TRIG_Pin GPIO_PIN_9
+#define SR04_TRIG_Pin GPIO_PIN_11
 #define SR04_TRIG_GPIO_Port GPIOA
 #define SCLK_Pin GPIO_PIN_6
 #define SCLK_GPIO_Port GPIOB

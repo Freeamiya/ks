@@ -20,11 +20,13 @@
 #include "main.h"
 #include "rtc.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "tm1637.h"
+#include "sr04.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +47,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+sr04_t sr04;
+uint8_t echo_flag = 0;
+uint16_t rising_cnt = 0, falling_cnt = 0;
 uint8_t CurrentDisplay[4];
 uint8_t tm1637_Segments[8] = {0};
 /* USER CODE END PV */
@@ -52,7 +57,7 @@ uint8_t tm1637_Segments[8] = {0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void display_distance_cm(uint32_t mm_distance);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -98,22 +103,46 @@ int main(void)
   MX_GPIO_Init();
   MX_RTC_Init();
   MX_TIM1_Init();
-  MX_TIM2_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
     HAL_GPIO_WritePin(SCLK_GPIO_Port, SCLK_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(SDO_GPIO_Port, SDO_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
-    CurrentDisplay[0] = char2segments('2');
-    CurrentDisplay[1] = char2segments('0');
-    CurrentDisplay[2] = char2segments('2');
-    CurrentDisplay[3] = char2segments('5');
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-      tm1637_DisplayHandle(7, CurrentDisplay);
+
     /* USER CODE BEGIN 3 */
+//      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 1);
+//      HAL_Delay(5);
+//      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 0);
+//      // 清零
+//      rising_cnt = 0;
+//      falling_cnt = 0;
+//      echo_flag = 0;
+//      __HAL_TIM_SET_COUNTER(&htim1, 0);
+//      // 开始捕获
+//      __HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+//      HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
+//      // 等待完成
+//      for (uint16_t i = 0; i < 150; i++)
+//      {
+//          if (rising_cnt != 0 && falling_cnt != 0)
+//          {
+//              // 计算距离
+//              // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
+//              float distance = (falling_cnt - rising_cnt) * 0.17;
+//              display_distance_cm((uint32_t)distance);  // 转换为毫米并显示
+//              break;
+//          }
+//          HAL_Delay(1);
+//      }
+//      // 停止捕获
+//      HAL_TIM_IC_Stop_IT(&htim1, TIM_CHANNEL_3);
+//      HAL_Delay(300);
   }
   /* USER CODE END 3 */
 }
@@ -166,7 +195,43 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void display_distance_cm(uint32_t mm_distance)
+{
+    uint32_t cm = mm_distance / 10;  // mm → cm，保留整数部分
 
+    CurrentDisplay[0] = char2segments('0' + (cm / 1000) % 10);
+    CurrentDisplay[1] = char2segments('0' + (cm / 100) % 10);
+    CurrentDisplay[2] = char2segments('0' + (cm / 10) % 10);
+    CurrentDisplay[3] = char2segments('0' + (cm % 10));
+
+    // 去除前导 0：替换为空格段码
+    if (cm < 1000) CurrentDisplay[0] = char2segments(' ');
+    if (cm < 100) CurrentDisplay[1] = char2segments(' ');
+    if (cm < 10) CurrentDisplay[2] = char2segments(' ');
+
+    // 发送到显示器
+    tm1637_DisplayHandle(7, CurrentDisplay);  // 亮度等级7
+}
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim == &htim1 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+    {
+        // 捕获到上升沿
+        if (!echo_flag)
+        {
+            rising_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            echo_flag = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+        }
+            // 捕获到下降沿
+        else
+        {
+            falling_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            echo_flag = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+        }
+    }
+}
 /* USER CODE END 4 */
 
 /**
