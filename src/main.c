@@ -11,15 +11,16 @@
 
 #include <reg52.h>
 #include <stdio.h>
+#include "TM1637.h"
 
 void delay_100ms(); //@12MHz
 
-void main()
+void main(void)
 {
+    TM1637_Init();
     while (1)
     {
-        P00 = !P00;
-        delay_100ms();
+        TM1637_DisplayDecimal(1234); // 显示数字
     }
 }
 
