@@ -26,7 +26,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "tm1637.h"
-#include "sr04.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +46,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-sr04_t sr04;
 uint8_t echo_flag = 0;
 uint16_t rising_cnt = 0, falling_cnt = 0;
 uint8_t CurrentDisplay[4];
@@ -116,33 +114,33 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 1);
-//      HAL_Delay(5);
-//      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 0);
-//      // 清零
-//      rising_cnt = 0;
-//      falling_cnt = 0;
-//      echo_flag = 0;
-//      __HAL_TIM_SET_COUNTER(&htim1, 0);
-//      // 开始捕获
-//      __HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
-//      HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
-//      // 等待完成
-//      for (uint16_t i = 0; i < 150; i++)
-//      {
-//          if (rising_cnt != 0 && falling_cnt != 0)
-//          {
-//              // 计算距离
-//              // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
-//              float distance = (falling_cnt - rising_cnt) * 0.17;
-//              display_distance_cm((uint32_t)distance);  // 转换为毫米并显示
-//              break;
-//          }
-//          HAL_Delay(1);
-//      }
-//      // 停止捕获
-//      HAL_TIM_IC_Stop_IT(&htim1, TIM_CHANNEL_3);
-//      HAL_Delay(300);
+      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 1);
+      HAL_Delay(5);
+      HAL_GPIO_WritePin(SR04_TRIG_GPIO_Port, SR04_TRIG_Pin, 0);
+      // 清零
+      rising_cnt = 0;
+      falling_cnt = 0;
+      echo_flag = 0;
+      __HAL_TIM_SET_COUNTER(&htim1, 0);
+      // 开始捕获
+      __HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+      HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
+      // 等待完成
+      for (uint16_t i = 0; i < 150; i++)
+      {
+          if (rising_cnt != 0 && falling_cnt != 0)
+          {
+              // 计算距离
+              // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
+              float distance = (falling_cnt - rising_cnt) * 0.17;
+              display_distance_cm((uint32_t)distance);  // 转换为毫米并显示
+              break;
+          }
+          HAL_Delay(1);
+      }
+      // 停止捕获
+      HAL_TIM_IC_Stop_IT(&htim1, TIM_CHANNEL_3);
+      HAL_Delay(300);
   }
   /* USER CODE END 3 */
 }
@@ -211,6 +209,8 @@ void display_distance_cm(uint32_t mm_distance)
 
     // 发送到显示器
     tm1637_DisplayHandle(7, CurrentDisplay);  // 亮度等级7
+
+
 }
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
