@@ -24,5 +24,5 @@ void get_distance(void)
 	TH0 = 0;				//定时计数器清零	
 	TL0 = 0;
 	
-	distance = (time * 1.7) / 100; //算出来是CM		
+	distance = (time * 1.7) / 100 + 1; //算出来是CM		
 }
