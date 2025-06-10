@@ -8,8 +8,8 @@ extern unsigned long time;	// 用于存储时间
 extern unsigned int distance;	// 距离值
 
 // Define the SR04 pins
-#define Trig P15		//触发信号控制端口
-#define Echo P16		//回响信号接收端口
+#define Trig P10		//触发信号控制端口
+#define Echo P11		//回响信号接收端口
 
 // Function 
 void start_ranging(void);
