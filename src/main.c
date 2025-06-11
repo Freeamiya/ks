@@ -15,16 +15,16 @@
 #include "sr04.h"
 
 #define beep_pin P36 // 蜂鸣器引脚
-#define LED_pin P07 // LED引脚
+#define LED_pin P20 // LED引脚
 
 bit beep_enable = 0; // 蜂鸣器使能标志
-unsigned int timer1_reload = 65536 - 2000; // 500us, 12MHz 时钟
+unsigned int timer1_reload = 65536 - 1000; // 500us, 12MHz 时钟
 
 // 位选引脚定义 (P2.4-P2.7对应G1-G4)
-#define G1  P16
-#define G2  P15
-#define G3  P14
-#define G4  P13
+#define G1  P27
+#define G2  P24
+#define G3  P25
+#define G4  P26
 unsigned char display[4]; // 存储四位数字
 
 // 共阳数码管段码表 (0-9)，低电平有效
@@ -83,7 +83,7 @@ void timer1_ISR(void) interrupt 3
     }
     else
     {
-        beep_pin = 1;         // 无声，默认拉高
+        beep_pin = 0;         // 无声，默认拉高
     }
 }
 
@@ -130,27 +130,24 @@ void main()
         // 分解距离值为四位数字
         get_digits(distance, display);
         // 动态扫描四位数码管
-        for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 50; j++) // 快速刷新50次（总刷新时间约200ms）
         {
-            // 关闭所有位选
-            P0 = 0xFF; 
-            G1 = 1;
-            G2 = 1;
-            G3 = 1;
-            G4 = 1;
-            // 设置段码
-            P0 = SegCode[display[i]];
-            // 选择对应位
-            switch (i)
+            for (int i = 0; i < 4; i++)
             {
-                case 0: G1 = 0; break; // 点亮第一位
-                case 1: G2 = 0; break; // 点亮第二位
-                case 2: G3 = 0; break; // 点亮第三位
-                case 3: G4 = 0; break; // 点亮第四位
+                P0 = 0xFF;
+                G1 = G2 = G3 = G4 = 1;
+                P0 = SegCode[display[i]];
+                switch (i)
+                {
+                    case 0: G1 = 0; break;
+                    case 1: G2 = 0; break;
+                    case 2: G3 = 0; break;
+                    case 3: G4 = 0; break;
+                }
+                delay_ms(1); // 延时1ms，确保数码管显示稳定
             }
-            delay_ms(5); // 延时2ms，保持显示
         }
-        // delay_ms(3); // 延时10ms
+        // delay_ms(10); // 延时10ms
         if (distance < 10) // 如果距离小于10cm
         {
             LED_pin = 0;
